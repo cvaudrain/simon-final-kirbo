@@ -1,0 +1,150 @@
+NOTES:
+
+Task:
+when we push a button, the game starts
+game starts by choosing a random color, flashing it, and remembering it
+player CLICKS the same color to start next backgroundNext round increments to 2 colors flashed and stored
+player CLICKS BOTH colors in border
+player must match each pattern
+game ends when player clicks wrong nextSequence
+buttons flash and make unique sound when interacted width
+
+PLAN:
+-Create empty arrays for the game pattern... DONE
+
+-1st, game pattern has to keep adding 1 more "color" value each round,
+2nd each round the game has to also flash/sound each button corresponding to the gamePattern array, while storing the array
+3rd player clicks those buttons in the same order, which also pushes the "color" value to the PLAYER clicked array.
+4th at the end of each round, query if game pattern array == player clicked array
+5th if True( game array == player click array ) cycle repeats from 1st Step
+5.5 if False, game ends and displays message that you suck and lose the game.
+
+Current issue:
+my code successfully runs if i copy each button 1 by 1... like green lights up, i click green, both arrays currently match.
+But then red lights up aand the game array is then  [green, red], while the player array is still [green, ]. So if i start from the beginning
+and enter green red, the game array would go green green red, because the first input is still there..
+So in this scenaario, for me to get the code to keep going, I haave to press each button right after the gme does, to keep the arrays matching...
+
+NEED: I need a way to keep the value of the game array, while going through and clicking each button as it appears in the game array
+I need to push consecutive buttons...
+Is there a way I can erase the player array,
+ then loop click events while incrementing i after each click, until EITHER
+gameArray[i] != playerArray[i], which temrinates game,
+OR until the arrays do match, which will trigger a new round....?
+
+
+BACKUP CODE UP TO THIS POINT:
+
+//Arrays...
+var gamePattern = ["dummy value to prevent clicks from working until game starts after button press"]
+var userClickedPattern = []
+var buttonColors = ["red","blue", "green", "yellow"]
+
+
+//Sound files
+var blueAudio = new Audio("sounds/blue.mp3");
+var redAudio = new Audio("sounds/red.mp3");
+var greenAudio = new Audio("sounds/green.mp3");
+var yellowAudio = new Audio("sounds/yellow.mp3");
+
+//Function that generates a random value representing which color is picked.
+function nextSequence(){
+ var randomNumber = Math.floor(Math.random() * 4);
+ return randomNumber
+}
+
+
+//First Keydown to get match started don keydown...
+$(document).one("keydown", (function(){
+  var randomChosenColor = buttonColors[nextSequence()] //this binds whichever color ( from 0-3 in the buttonColors Array) to the variable randomChosenColor. resets on each keydown currently
+  flash(randomChosenColor);
+  gamePattern.pop()  //removes that dummy variable up there
+  gamePattern.push(randomChosenColor)
+}))
+
+var roundInProgress = "true"  //gonna use this to toggle on and off this function, so that you can click the whole sequence without the function starting over.
+var i = 0 //needs to be out here so it's not reset to 0 on each click.
+$(".btn").click(function(){
+  //heading round number could be incremented here and class toggled?
+
+  if(roundInProgress == "true"){
+  $(this).toggleClass("btn") //should remove the button class so that wehen we push the classes, the color name class is the only class, which will match the caase for our switch statement above.
+  var userColor = $(this).attr("class");
+  $(this).toggleClass("btn") //should put the btn class back right away..
+
+
+userClickedPattern.push(userColor); //should just equal the color, ex. "blue" and not "btn blue". Pushes color to player array.
+
+//need TEST here- re arrays EQUAL? If not, game over HERE.
+if(gamePattern[i] == userClickedPattern[i]){
+//Round 2 starts here IF our "if" statement returns true. Same as our original keydown event, but now it won't be activated by a keydown.
+flash(userColor);
+var randomChosenColor = buttonColors[nextSequence()] //this binds whichever color ( from 0-3 in the buttonColors Array) to the variable randomChosenColor. resets on each keydown currently
+setTimeout(function(){flash(randomChosenColor);
+}, 1000)
+i++ //increments i so we can test the NEXT index value in each array next round.
+gamePattern.push(randomChosenColor)
+
+}
+else{ //if the arrays are not equal, i.e you clicked the wrong color
+  roundInProgress = "false" //should prevent this entire function from running next time a click happens...
+  //loser heading would go here.
+  console.log("game over")
+}
+}
+})
+
+
+
+
+
+
+
+
+function flash(color){
+  switch(color){
+
+    case "red":
+    $(".red").css("visibility", "hidden");
+    setTimeout(function(){
+      $(".red").css("visibility", "visible")
+    }, 50)
+    redAudio.play();
+    break;
+
+    case "blue":
+    $(".blue").css("visibility", "hidden");
+    setTimeout(function(){
+      $(".blue").css("visibility", "visible")
+    }, 50)
+    blueAudio.play();
+    break;
+
+    case "green":
+    $(".green").css("visibility", "hidden");
+    setTimeout(function(){
+      $(".green").css("visibility", "visible")
+    }, 50);
+    greenAudio.play();
+    break;
+
+    case "yellow":
+    $(".yellow").css("visibility", "hidden");
+    setTimeout(function(){
+      $(".yellow").css("visibility", "visible")
+    }, 50);
+    yellowAudio.play();
+  }
+}
+
+//End Master function
+
+/*
+$(document).click(function(){ //this code makes a flash successfully on page click
+    $(".red").css("visibility", "hidden");
+    setTimeout(function(){
+      $(".red").css("visibility", "visible")
+    }, 50)
+
+})
+*/
