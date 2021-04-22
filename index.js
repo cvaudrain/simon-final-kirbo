@@ -110,7 +110,7 @@ $(document).keydown(function(){
   }
 })
 if(j == 5){
-  $("h1").text("Wow u r a god at the game")
+  $("h1").text("Wow you're good")
 }
 })
 
